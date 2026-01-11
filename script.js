@@ -242,7 +242,7 @@ const AuthService = {
         return null;
     },
 
-    register(email, name, avatarColor) {
+    register(email, name, avatarColor, picture = null) {
         if (this.getUser(email)) return null; // Already exists
 
         // Generate Permanent Code
@@ -254,6 +254,7 @@ const AuthService = {
             email,
             name,
             avatarColor,
+            picture,
             code,
             registeredAt: new Date().toISOString()
         };
@@ -269,8 +270,47 @@ const AuthService = {
 
     logout() {
         localStorage.removeItem(this.CURRENT_USER_KEY);
+        updateNavbarProfile(null); // Reset navbar
     }
 };
+
+function updateNavbarProfile(user) {
+    const btnLogin = document.querySelector('.btn-login');
+    if (!btnLogin) return;
+
+    if (user) {
+        // Show Avatar
+        btnLogin.innerHTML = '';
+        btnLogin.style.padding = "5px 15px"; // Adjust padding
+
+        const img = document.createElement('img');
+        if (user.picture) {
+            img.src = user.picture;
+        } else {
+            // Fallback
+            img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=${user.avatarColor.replace('#', '')}&color=fff`;
+        }
+
+        img.style.width = '28px';
+        img.style.height = '28px';
+        img.style.borderRadius = '50%';
+        img.style.verticalAlign = 'middle';
+        img.style.border = '2px solid #ff4500';
+
+        btnLogin.appendChild(img);
+
+        const span = document.createElement('span');
+        span.innerText = " " + user.name.split(' ')[0]; // First name only
+        span.style.marginLeft = "8px";
+        span.style.fontSize = "14px";
+        btnLogin.appendChild(span);
+
+    } else {
+        // Show Login
+        btnLogin.innerHTML = '<i class="fa-solid fa-user"></i> Login';
+        btnLogin.style.padding = ""; // Reset
+    }
+}
 
 // ------------------------------------------------------------------------
 // Modal & New Login Flow Logic
