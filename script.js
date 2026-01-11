@@ -433,7 +433,6 @@ function showGeneratedCodeSection(user) {
 
     // Populate Data
     document.getElementById('user-name').innerText = user.name;
-    document.getElementById('user-email').innerText = user.email;
     document.getElementById('user-avatar').innerText = user.name.charAt(0).toUpperCase();
     document.getElementById('user-avatar').style.backgroundColor = user.avatarColor;
 
