@@ -93,6 +93,40 @@
             </div>
 
             <!-- Step 3: Registration/Code (Existing Flow) -->
+            <!-- User Profile Display -->
+            <div class="user-profile mb-20" id="user-profile-display">
+                <div class="user-avatar" id="user-avatar">
+                    <!-- Avatar will be injected here -->
+                </div>
+                <div class="user-info">
+                    <h3 id="user-name">User Name</h3>
+                    <p id="user-email">user@example.com</p>
+                </div>
+                <!-- Edit Button -->
+                <button class="btn-icon" id="btn-edit-profile" title="Editar Perfil"
+                    style="background:none; border:none; color:#888; cursor:pointer; margin-left:10px;">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+            </div>
+
+            <!-- Hidden Edit Form -->
+            <div id="edit-profile-form"
+                style="display: none; margin-bottom: 20px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
+                <div class="form-group mb-10">
+                    <label style="display:block; font-size:12px; margin-bottom:5px; color:#aaa;">Nuevo Nombre</label>
+                    <input type="text" id="edit-name-input" class="modern-input" placeholder="Tu Nombre">
+                </div>
+                <div class="form-group mb-10">
+                    <label style="display:block; font-size:12px; margin-bottom:5px; color:#aaa;">Cambiar Avatar</label>
+                    <input type="file" id="edit-avatar-input" accept="image/*" style="color:white; font-size:12px;">
+                </div>
+                <div style="text-align:right;">
+                    <button id="btn-cancel-edit"
+                        style="background:none; border:none; color:#aaa; cursor:pointer; margin-right:10px;">Cancelar</button>
+                    <button id="btn-save-edit" class="btn-primary"
+                        style="padding: 5px 15px; font-size:12px;">Guardar</button>
+                </div>
+            </div>
             <div id="step-generate" style="display: none;">
                 <div class="user-profile">
                     <div class="user-avatar" id="user-avatar">U</div>

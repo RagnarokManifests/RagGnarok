@@ -264,6 +264,22 @@ const AuthService = {
         return newUser;
     },
 
+    updateUser(email, updates) {
+        let user = this.getUser(email);
+        if (!user) return null;
+
+        // Merge updates
+        user = { ...user, ...updates };
+        this.saveUser(email, user);
+
+        // Update session if it's current user
+        const currentUser = this.getCurrentUser();
+        if (currentUser && currentUser.email === email) {
+            localStorage.setItem(this.CURRENT_USER_KEY, JSON.stringify(user));
+        }
+        return user;
+    },
+
     getCurrentUser() {
         return JSON.parse(localStorage.getItem(this.CURRENT_USER_KEY));
     },
@@ -427,6 +443,64 @@ function showGeneratedCodeSection(user) {
 
     // Hide "Generate" button 
     document.getElementById('generation-controls').style.display = 'none';
+
+    // --- Edit Profile Logic ---
+    const btnEdit = document.getElementById('btn-edit-profile');
+    const formEdit = document.getElementById('edit-profile-form');
+    const btnCancel = document.getElementById('btn-cancel-edit');
+    const btnSave = document.getElementById('btn-save-edit');
+    const inputName = document.getElementById('edit-name-input');
+    const inputAvatar = document.getElementById('edit-avatar-input');
+
+    if (btnEdit && formEdit) {
+        // Clear previous listeners to avoid duplicates if re-rendered
+        btnEdit.onclick = null;
+        btnCancel.onclick = null;
+        btnSave.onclick = null;
+
+        btnEdit.onclick = () => {
+            formEdit.style.display = 'block';
+            inputName.value = user.name;
+        };
+
+        btnCancel.onclick = () => {
+            formEdit.style.display = 'none';
+        };
+
+        btnSave.onclick = () => {
+            const newName = inputName.value.trim();
+            const file = inputAvatar.files[0];
+            const updates = {};
+
+            if (newName && newName !== user.name) {
+                updates.name = newName;
+            }
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onloadend = function () {
+                    updates.picture = reader.result; // Base64 string
+                    AuthService.updateUser(user.email, updates);
+                    refreshUI();
+                }
+                reader.readAsDataURL(file);
+            } else {
+                if (Object.keys(updates).length > 0) {
+                    AuthService.updateUser(user.email, updates);
+                    refreshUI();
+                } else {
+                    formEdit.style.display = 'none';
+                }
+            }
+        };
+
+        function refreshUI() {
+            const updatedUser = AuthService.getUser(user.email);
+            formEdit.style.display = 'none';
+            showGeneratedCodeSection(updatedUser); // Recursively re-render
+            updateNavbarProfile(updatedUser);
+        }
+    }
 }
 
 function showManualEntry() {
@@ -539,6 +613,7 @@ function handleAuthSuccess(email, provider) {
         user = AuthService.register(email, name, color);
     }
 
+    updateNavbarProfile(user);
     showGeneratedCodeSection(user);
 }
 
@@ -590,9 +665,11 @@ function handleCredentialResponse(response) {
     // Login/Register in our LocalStorage system
     let user = AuthService.login(email);
     if (!user) {
-        user = AuthService.register(email, name, color);
+        user = AuthService.register(email, name, color, picture);
         // We could save the picture URL too if we updated AuthService
     }
+
+    updateNavbarProfile(user);
 
     showGeneratedCodeSection(user);
     if (document.getElementById('user-avatar')) {
@@ -615,6 +692,12 @@ function decodeJwtResponse(token) {
 
 // Initialize on Load
 window.onload = function () {
+    // Restore Session Visuals
+    const currentUser = AuthService.getCurrentUser();
+    if (currentUser) {
+        updateNavbarProfile(currentUser);
+    }
+
     if (typeof google !== 'undefined') {
         google.accounts.id.initialize({
             client_id: "388530458879-liea4p3usr24asno7ue2fm75nhvk7org.apps.googleusercontent.com",
