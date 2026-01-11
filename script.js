@@ -287,6 +287,7 @@ const AuthService = {
     logout() {
         localStorage.removeItem(this.CURRENT_USER_KEY);
         updateNavbarProfile(null); // Reset navbar
+        resetToProviders();        // Reset modal to login screen
     }
 };
 
@@ -433,8 +434,24 @@ function showGeneratedCodeSection(user) {
 
     // Populate Data
     document.getElementById('user-name').innerText = user.name;
-    document.getElementById('user-avatar').innerText = user.name.charAt(0).toUpperCase();
-    document.getElementById('user-avatar').style.backgroundColor = user.avatarColor;
+
+    // Handle Avatar (Image vs Initials)
+    const avatarEl = document.getElementById('user-avatar');
+    avatarEl.innerHTML = ''; // Clear previous
+
+    if (user.picture) {
+        const img = document.createElement('img');
+        img.src = user.picture;
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.borderRadius = '50%';
+        img.style.objectFit = 'cover';
+        avatarEl.appendChild(img);
+        avatarEl.style.backgroundColor = 'transparent';
+    } else {
+        avatarEl.innerText = user.name.charAt(0).toUpperCase();
+        avatarEl.style.backgroundColor = user.avatarColor;
+    }
 
     // Show code directly
     document.getElementById('generated-code').innerText = user.code;
