@@ -512,5 +512,77 @@ function simulateDiscordLogin() {
 }
 
 function simulateGoogleLoginProcess() {
-    openAuthPopup('google');
+    // TRIGGER REAL GOOGLE PROMPT
+    if (typeof google !== 'undefined') {
+        google.accounts.id.prompt((notification) => {
+            if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+                // Determine reason and maybe fallback to popup
+                console.log("Google Prompt skipped/not displayed:", notification.getNotDisplayedReason());
+                // Fallback to manual button render if prompt fails (optional)
+            }
+        });
+    } else {
+        alert("Google Library not loaded yet. Please check connection.");
+    }
+}
+
+// ------------------------------------------------------------------------
+// REAL GOOGLE IDENTITY SERVICES IMPLEMENTATION
+// ------------------------------------------------------------------------
+
+function handleCredentialResponse(response) {
+    // This is the Real JWT Token from Google
+    console.log("Encoded JWT ID token: " + response.credential);
+
+    // In a production app, you would send this 'response.credential' 
+    // to your backend for verification. 
+    // Since we are client-side only (GitHub Pages), we decod it locally 
+    // just to show the user data. (SECURITY NOTE: Verification typically needs backend)
+
+    const responsePayload = decodeJwtResponse(response.credential);
+
+    const email = responsePayload.email;
+    const name = responsePayload.name;
+    const picture = responsePayload.picture;
+    const color = "#ffffff"; // Default
+
+    // Login/Register in our LocalStorage system
+    let user = AuthService.login(email);
+    if (!user) {
+        user = AuthService.register(email, name, color);
+        // We could save the picture URL too if we updated AuthService
+    }
+
+    showGeneratedCodeSection(user);
+    if (document.getElementById('user-avatar')) {
+        // Show real Google photo
+        const avatar = document.getElementById('user-avatar');
+        avatar.innerHTML = `<img src="${picture}" style="width:100%; height:100%; border-radius:50%;">`;
+        avatar.style.backgroundColor = "transparent";
+    }
+}
+
+function decodeJwtResponse(token) {
+    var base64Url = token.split('.')[1];
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+}
+
+// Initialize on Load
+window.onload = function () {
+    if (typeof google !== 'undefined') {
+        google.accounts.id.initialize({
+            client_id: "388530458879-liea4p3usr24asno7ue2fm75nhvk7org.apps.googleusercontent.com",
+            callback: handleCredentialResponse,
+            auto_select: true, // Try to auto-sign in
+            cancel_on_tap_outside: false
+        });
+
+        // Also render a button in the specific div if we want standard button
+        // google.accounts.id.renderButton(document.getElementById("google-btn-container"), ...);
+    }
 }
