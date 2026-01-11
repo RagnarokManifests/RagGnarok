@@ -248,7 +248,7 @@ const AuthService = {
         // Generate Permanent Code
         const segment1 = Math.random().toString(36).substring(2, 6).toUpperCase();
         const segment2 = Math.random().toString(36).substring(2, 6).toUpperCase();
-        const code = `SWA2-${segment1}-${segment2}`;
+        const code = `RAGNAROK-${segment1}-${segment2}`;
 
         const newUser = {
             email,
@@ -551,7 +551,7 @@ function simulateRegistration() {
         // Generate random code
         const segment1 = Math.random().toString(36).substring(2, 6).toUpperCase();
         const segment2 = Math.random().toString(36).substring(2, 6).toUpperCase();
-        const code = `SWA2-${segment1}-${segment2}`;
+        const code = `RAGNAROK-${segment1}-${segment2}`;
 
         // Show result
         document.getElementById('generated-code').textContent = code;
