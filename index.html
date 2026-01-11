@@ -111,22 +111,30 @@
 
                 <!-- Hidden Edit Form -->
                 <div id="edit-profile-form"
-                    style="display: none; margin-bottom: 20px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
-                    <div class="form-group mb-10">
-                        <label style="display:block; font-size:12px; margin-bottom:5px; color:#aaa;">Nuevo
-                            Nombre</label>
-                        <input type="text" id="edit-name-input" class="modern-input" placeholder="Tu Nombre">
+                    style="display: none; margin-bottom: 25px; background: #151515; padding: 20px; border-radius: 12px; border: 1px solid #333;">
+
+                    <div class="form-group mb-15" style="text-align: left;">
+                        <label
+                            style="display:block; font-size:12px; margin-bottom:8px; color:#888; letter-spacing: 0.5px;">NUEVO
+                            NOMBRE</label>
+                        <input type="text" id="edit-name-input" class="modern-input" placeholder="Escribe tu nombre..."
+                            style="width: 100%; box-sizing: border-box;">
                     </div>
-                    <div class="form-group mb-10">
-                        <label style="display:block; font-size:12px; margin-bottom:5px; color:#aaa;">Cambiar
-                            Avatar</label>
-                        <input type="file" id="edit-avatar-input" accept="image/*" style="color:white; font-size:12px;">
+
+                    <div class="form-group mb-20" style="text-align: left;">
+                        <label
+                            style="display:block; font-size:12px; margin-bottom:8px; color:#888; letter-spacing: 0.5px;">AVATAR</label>
+                        <!-- Custom Upload UI -->
+                        <label for="edit-avatar-input" class="custom-file-upload">
+                            <i class="fa-solid fa-camera"></i>
+                            <span id="file-name-display">Subir nueva imagen</span>
+                        </label>
+                        <input type="file" id="edit-avatar-input" accept="image/*" class="hidden-input">
                     </div>
-                    <div style="text-align:right;">
-                        <button id="btn-cancel-edit"
-                            style="background:none; border:none; color:#aaa; cursor:pointer; margin-right:10px;">Cancelar</button>
-                        <button id="btn-save-edit" class="btn-primary"
-                            style="padding: 5px 15px; font-size:12px;">Guardar</button>
+
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button id="btn-cancel-edit" class="btn-text">Cancelar</button>
+                        <button id="btn-save-edit" class="btn-primary-sm">Guardar Cambios</button>
                     </div>
                 </div>
 

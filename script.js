@@ -473,6 +473,7 @@ function showGeneratedCodeSection(user) {
         btnEdit.onclick = null;
         btnCancel.onclick = null;
         btnSave.onclick = null;
+        inputAvatar.onchange = null; // Clear input listener
 
         btnEdit.onclick = () => {
             formEdit.style.display = 'block';
@@ -481,6 +482,15 @@ function showGeneratedCodeSection(user) {
 
         btnCancel.onclick = () => {
             formEdit.style.display = 'none';
+        };
+
+        // Show filename when selected
+        inputAvatar.onchange = function () {
+            const fileNameDisplay = document.getElementById('file-name-display');
+            if (this.files && this.files.length > 0) {
+                fileNameDisplay.textContent = this.files[0].name;
+                fileNameDisplay.style.color = 'white';
+            }
         };
 
         btnSave.onclick = () => {
