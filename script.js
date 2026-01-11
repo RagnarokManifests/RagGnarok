@@ -504,7 +504,7 @@ function handleAuthSuccess(email, provider) {
 
 // Override previous simulation functions to use Popup
 function showGoogleLoginSimulation() {
-    openAuthPopup('google');
+    simulateGoogleLoginProcess(); // Redirect to Real Logic directly
 }
 
 function simulateDiscordLogin() {
