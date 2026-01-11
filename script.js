@@ -208,3 +208,309 @@ document.addEventListener('DOMContentLoaded', () => {
         this.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
     }
 });
+
+// Modal Logic
+// ------------------------------------------------------------------------
+// Auth System (LocalStorage 'Database')
+// ------------------------------------------------------------------------
+
+const AuthService = {
+    DB_KEY: 'swa_users_db',
+    CURRENT_USER_KEY: 'swa_current_user',
+
+    getUsers() {
+        return JSON.parse(localStorage.getItem(this.DB_KEY) || '{}');
+    },
+
+    saveUser(email, userData) {
+        const users = this.getUsers();
+        users[email] = userData;
+        localStorage.setItem(this.DB_KEY, JSON.stringify(users));
+    },
+
+    getUser(email) {
+        const users = this.getUsers();
+        return users[email];
+    },
+
+    login(email) {
+        const user = this.getUser(email);
+        if (user) {
+            localStorage.setItem(this.CURRENT_USER_KEY, JSON.stringify(user));
+            return user;
+        }
+        return null;
+    },
+
+    register(email, name, avatarColor) {
+        if (this.getUser(email)) return null; // Already exists
+
+        // Generate Permanent Code
+        const segment1 = Math.random().toString(36).substring(2, 6).toUpperCase();
+        const segment2 = Math.random().toString(36).substring(2, 6).toUpperCase();
+        const code = `SWA2-${segment1}-${segment2}`;
+
+        const newUser = {
+            email,
+            name,
+            avatarColor,
+            code,
+            registeredAt: new Date().toISOString()
+        };
+
+        this.saveUser(email, newUser);
+        this.login(email);
+        return newUser;
+    },
+
+    getCurrentUser() {
+        return JSON.parse(localStorage.getItem(this.CURRENT_USER_KEY));
+    },
+
+    logout() {
+        localStorage.removeItem(this.CURRENT_USER_KEY);
+    }
+};
+
+// ------------------------------------------------------------------------
+// Modal & New Login Flow Logic
+// ------------------------------------------------------------------------
+
+function openLoginModal() {
+    const modal = document.getElementById('login-modal');
+    modal.classList.add('active');
+
+    // Check if already logged in
+    const currentUser = AuthService.getCurrentUser();
+    if (currentUser) {
+        showGeneratedCodeSection(currentUser);
+    } else {
+        resetToProviders();
+    }
+}
+
+function closeLoginModal() {
+    document.getElementById('login-modal').classList.remove('active');
+}
+
+function resetToProviders() {
+    // Hide all sections
+    document.getElementById('step-providers').style.display = 'block';
+    document.getElementById('step-google-login').style.display = 'none';
+    document.getElementById('step-generate').style.display = 'none';
+    document.getElementById('manual-entry-section').style.display = 'none';
+    document.getElementById('register-section').style.display = 'none';
+}
+
+function showGoogleLoginSimulation() {
+    document.getElementById('step-providers').style.display = 'none';
+    document.getElementById('step-google-login').style.display = 'block';
+}
+
+function simulateDiscordLogin() {
+    // Discord Simulation (Direct "Authorize" popup feel)
+    const btn = document.querySelector('.btn-discord');
+    const originalContent = btn.innerHTML;
+
+    // Simulate "Select Account" 
+    const mockEmail = "gamer.tag#1234";
+    const mockName = "GamerTag";
+
+    btn.innerHTML = 'Connecting to Discord...';
+    btn.style.opacity = '0.7';
+
+    setTimeout(() => {
+        let user = AuthService.login(mockEmail);
+
+        if (!user) {
+            // Register new user automatically
+            const color = "#5865F2"; // Discord blurple
+            user = AuthService.register(mockEmail, mockName, color);
+        }
+
+        // Show Account
+        showGeneratedCodeSection(user);
+
+        // Reset button
+        btn.innerHTML = originalContent;
+        btn.style.opacity = '1';
+    }, 1500);
+}
+
+function simulateGoogleLoginProcess() {
+    const btn = document.querySelector('#step-google-login .btn-google');
+    const originalContent = btn.innerHTML;
+
+    // Simulate "Select Account" 
+    const mockEmail = "simon.developer@gmail.com";
+    const mockName = "Simon Developer";
+
+    btn.innerHTML = 'Verificando...';
+    btn.style.opacity = '0.7';
+
+    setTimeout(() => {
+        let user = AuthService.login(mockEmail);
+
+        if (!user) {
+            // Register new user automatically
+            const color = "#" + Math.floor(Math.random() * 16777215).toString(16);
+            user = AuthService.register(mockEmail, mockName, color);
+        }
+
+        // Show Account
+        showGeneratedCodeSection(user);
+
+        // Reset button
+        btn.innerHTML = originalContent;
+        btn.style.opacity = '1';
+    }, 1500);
+}
+
+function showGeneratedCodeSection(user) {
+    // Hide all
+    document.getElementById('step-providers').style.display = 'none';
+    document.getElementById('step-google-login').style.display = 'none';
+    document.getElementById('manual-entry-section').style.display = 'none';
+
+    // Show Generate
+    document.getElementById('step-generate').style.display = 'block';
+
+    // Populate Data
+    document.getElementById('user-name').innerText = user.name;
+    document.getElementById('user-email').innerText = user.email;
+    document.getElementById('user-avatar').innerText = user.name.charAt(0).toUpperCase();
+    document.getElementById('user-avatar').style.backgroundColor = user.avatarColor;
+
+    // Show code directly
+    document.getElementById('generated-code').innerText = user.code;
+    document.getElementById('code-display-area').style.display = 'block';
+
+    // Hide "Generate" button 
+    document.getElementById('generation-controls').style.display = 'none';
+}
+
+function showManualEntry() {
+    document.getElementById('step-providers').style.display = 'none';
+    document.getElementById('manual-entry-section').style.display = 'block';
+}
+
+function showRegisterSection() {
+    showGoogleLoginSimulation();
+}
+
+// ... existing generation and copy code functions ...
+
+function simulateRegistration() {
+    const btn = document.querySelector('#generation-controls .btn-primary');
+    const originalText = btn.innerHTML;
+
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> GENERANDO...';
+    btn.disabled = true;
+
+    setTimeout(() => {
+        // Generate random code
+        const segment1 = Math.random().toString(36).substring(2, 6).toUpperCase();
+        const segment2 = Math.random().toString(36).substring(2, 6).toUpperCase();
+        const code = `SWA2-${segment1}-${segment2}`;
+
+        // Show result
+        document.getElementById('generated-code').textContent = code;
+        document.getElementById('generation-controls').style.display = 'none';
+        document.getElementById('code-display-area').style.display = 'block';
+
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+
+        // Auto fill manual entry (for convenience)
+        document.getElementById('webActivationCode').value = code;
+    }, 2000);
+}
+
+function copyCode() {
+    const code = document.getElementById('generated-code').textContent;
+    navigator.clipboard.writeText(code).then(() => {
+        alert("¡Código copiado al portapapeles!");
+    });
+}
+
+function startGuestMode() {
+    alert("Iniciando Modo Invitado (Simulación)...");
+    setTimeout(() => {
+        closeLoginModal();
+    }, 1000);
+}
+
+function webLogin() {
+    const code = document.getElementById('webActivationCode').value;
+    if (code.length < 5) {
+        alert("Por favor ingresa un código válido.");
+        return;
+    }
+    // Mock login for web demo
+    alert("Simulando conexión a API SWA...\nCódigo: " + code);
+    setTimeout(() => {
+        closeLoginModal();
+        alert("¡Éxito! (Demo)");
+    }, 1500);
+}
+
+
+// ------------------------------------------------------------------------
+// External Popup Auth Logic (Overrides previous functions)
+// ------------------------------------------------------------------------
+
+function openAuthPopup(provider) {
+    const width = 500;
+    const height = 600;
+    const left = (window.screen.width - width) / 2;
+    const top = (window.screen.height - height) / 2;
+
+    // Open auth.html as a popup
+    const popup = window.open(
+        `auth.html?provider=${provider}`,
+        'SWA_Auth',
+        `width=${width},height=${height},top=${top},left=${left}`
+    );
+}
+
+// Global Message Listener for Auth Popup
+window.addEventListener('message', (event) => {
+    if (event.data.type === 'AUTH_SUCCESS') {
+        const { provider, email } = event.data;
+        handleAuthSuccess(email, provider);
+    }
+});
+
+function handleAuthSuccess(email, provider) {
+    // Determine Name per provider (simulated)
+    let name = "User";
+    let color = "#1a73e8";
+
+    if (provider === 'discord') {
+        name = "GamerTag";
+        color = "#5865F2";
+    } else {
+        name = "Simon Developer";
+        color = "#ea4335";
+    }
+
+    let user = AuthService.login(email);
+    if (!user) {
+        user = AuthService.register(email, name, color);
+    }
+
+    showGeneratedCodeSection(user);
+}
+
+// Override previous simulation functions to use Popup
+function showGoogleLoginSimulation() {
+    openAuthPopup('google');
+}
+
+function simulateDiscordLogin() {
+    openAuthPopup('discord');
+}
+
+function simulateGoogleLoginProcess() {
+    openAuthPopup('google');
+}

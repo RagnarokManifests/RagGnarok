@@ -32,6 +32,8 @@
                 <li><a href="#features" data-i18n="nav_features">Características</a></li>
                 <li><a href="#showcase" data-i18n="nav_interface">Interfaz</a></li>
                 <li><a href="#download" class="btn-nav" data-i18n="nav_download">Descargar</a></li>
+                <li><a href="#" class="btn-login" onclick="openLoginModal()"><i class="fa-solid fa-user"></i> Login</a>
+                </li>
                 <li><a href="#" class="lang-toggle" id="lang-toggle">EN</a></li>
             </ul>
             <div class="mobile-toggle">
@@ -39,6 +41,110 @@
             </div>
         </div>
     </nav>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal-overlay">
+        <div class="modal-content" style="background: #0f1014; border: 1px solid #1e2124; max-width: 400px;">
+            <button class="modal-close" onclick="closeLoginModal()"><i class="fas fa-times"></i></button>
+
+            <!-- Step 1: Provider Selection -->
+            <div id="step-providers">
+                <h2 class="modal-title" style="text-align: center;">LOGIN</h2>
+
+                <button class="provider-btn btn-discord" onclick="simulateDiscordLogin()">
+                    <i class="fab fa-discord"></i> Sign in with Discord
+                </button>
+
+                <button class="provider-btn btn-google-provider" onclick="showGoogleLoginSimulation()">
+                    <i class="fab fa-google"></i> Sign in with Google
+                </button>
+
+                <button class="provider-btn btn-email" onclick="showManualEntry()">
+                    <i class="fas fa-envelope"></i> Sign in with E-Mail / Code
+                </button>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="#"
+                        style="color: #007bff; text-decoration: none; font-size: 14px; display: block; margin-bottom: 10px;">Forgot
+                        password?</a>
+                    <span style="color: #72767d; font-size: 14px;">Don't have an account? <a href="#"
+                            onclick="showRegisterSection()" style="color: #007bff; text-decoration: none;">Register
+                            here.</a></span>
+                </div>
+            </div>
+
+            <!-- Step 2: Google Login Simulation (Embedded) -->
+            <div id="step-google-login" style="display: none;">
+                <h3 style="color: white; margin-bottom: 20px; font-size: 16px; text-align: center;">Inicia sesión con
+                    Google</h3>
+
+                <button class="btn-google" onclick="simulateGoogleLoginProcess()">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="G"
+                        style="width: 20px; height: 20px;">
+                    <span style="font-weight: 500;">Continuar con Google</span>
+                </button>
+
+                <button class="btn-sm btn-secondary" onclick="resetToProviders()"
+                    style="margin-top: 15px; width: 100%;">
+                    <i class="fas fa-arrow-left"></i> Volver a opciones
+                </button>
+            </div>
+
+            <!-- Step 3: Registration/Code (Existing Flow) -->
+            <div id="step-generate" style="display: none;">
+                <div class="user-profile">
+                    <div class="user-avatar" id="user-avatar">U</div>
+                    <div class="user-info">
+                        <div style="font-size: 14px; font-weight: bold; color: white;" id="user-name">Usuario</div>
+                        <div style="font-size: 12px; color: #aaa;" id="user-email">usuario@gmail.com</div>
+                    </div>
+                </div>
+
+                <h3 style="color: white; margin-bottom: 15px; font-size: 16px; text-align: center;">Generar Código de
+                    Acceso</h3>
+
+                <div id="code-display-area"
+                    style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 15px; display: none;">
+                    <p style="color: #aaa; font-size: 12px; margin-bottom: 5px;">TU CÓDIGO GENERADO:</p>
+                    <div style="font-family: monospace; font-size: 18px; color: #ff4500; font-weight: bold; margin-bottom: 10px;"
+                        id="generated-code"></div>
+                    <button class="btn-sm btn-secondary" onclick="copyCode()"
+                        style="font-size: 12px; padding: 5px 10px;"><i class="fas fa-copy"></i> Copiar</button>
+                </div>
+
+                <div id="generation-controls">
+                    <button class="btn btn-primary btn-block" onclick="simulateRegistration()">
+                        <i class="fas fa-magic"></i> GENERAR LICENCIA GRATIS
+                    </button>
+                </div>
+
+                <button class="btn-sm btn-secondary" onclick="resetToProviders()"
+                    style="margin-top: 15px; width: 100%;">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </button>
+            </div>
+
+            <!-- Manual Activation Section (Hidden) -->
+            <div id="manual-entry-section" style="display: none;">
+                <h3 style="color: white; margin-bottom: 15px; text-align: center;">Ingresar Código</h3>
+                <div class="input-group">
+                    <i class="fas fa-key"></i>
+                    <input type="text" id="webActivationCode" class="modal-input" placeholder="SWA2-XXXX-XXXX">
+                </div>
+
+                <div class="actions-stack" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+                    <button class="btn btn-primary btn-block" onclick="webLogin()">
+                        ACTIVAR / ENTRAR <i class="fas fa-arrow-right"></i>
+                    </button>
+
+                    <button class="btn btn-secondary btn-block" onclick="resetToProviders()">
+                        <i class="fas fa-arrow-left"></i> VOLVER
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
 
     <header class="hero">
         <div class="container hero-content">
