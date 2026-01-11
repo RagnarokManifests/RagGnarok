@@ -516,13 +516,14 @@ function simulateGoogleLoginProcess() {
     if (typeof google !== 'undefined') {
         google.accounts.id.prompt((notification) => {
             if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-                // Determine reason and maybe fallback to popup
-                console.log("Google Prompt skipped/not displayed:", notification.getNotDisplayedReason());
-                // Fallback to manual button render if prompt fails (optional)
+                // Determine reason and warn user
+                const reason = notification.getNotDisplayedReason();
+                console.log("Google Prompt skipped:", reason);
+                alert("Google Sign-In bloqueado o falló. Razón: " + reason + "\n\nIntenta desactivar el bloqueador de anuncios (Brave Shields).");
             }
         });
     } else {
-        alert("Google Library not loaded yet. Please check connection.");
+        alert("Error: Librería de Google no cargada.\n\nEs posible que tu navegador (Brave/AdBlock) la esté bloqueando.");
     }
 }
 
